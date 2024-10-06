@@ -1,5 +1,5 @@
 <template>
-    <h3>这是处理network的excel数据</h3>
+    <h3>这是处理network的excel数据<el-button type="primary" plain @click="handleClickExcel">下载excel模版</el-button></h3>
 
     <el-upload
         v-model:file-list="fileList"
@@ -56,6 +56,26 @@ let excelData = {
     nameIndex: -1,
     targetIndex: -1,
     resultIndex: -1
+}
+
+
+// 导出为 Excel 文件
+const exportToExcel = (resultData, fileName) => {
+    // 创建新的工作簿和工作表
+    const worksheet = XLSX.utils.aoa_to_sheet(resultData); // 将二维数组转换为工作表
+    const workbook = XLSX.utils.book_new(); // 新建工作簿
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1'); // 将工作表添加到工作簿
+    // 生成 Excel 文件并下载
+    XLSX.writeFile(workbook, fileName);
+    loading.value = false
+}
+
+const handleClickExcel = () => {
+    const excelData = [
+        ["Common name", "Name", "Result", "Target"],
+        ["", "", "", ""]
+    ]
+    exportToExcel(excelData, "network处理模版.xlsx")
 }
 const handleExcelWithDownload = () => {
     if (fileList.value.length === 0) {
@@ -121,17 +141,6 @@ const handleExcelWithDownload = () => {
     
 }
 
-// 导出为 Excel 文件
-const exportToExcel = (resultData) => {
-    // 创建新的工作簿和工作表
-    const worksheet = XLSX.utils.aoa_to_sheet(resultData); // 将二维数组转换为工作表
-    const workbook = XLSX.utils.book_new(); // 新建工作簿
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1'); // 将工作表添加到工作簿
-    // 生成 Excel 文件并下载
-    console.log("开始导出", fileList.value[0].name)
-    XLSX.writeFile(workbook, fileList.value[0].name);
-    loading.value = false
-}
 
 const handleExcelData = (jsonData) => {
     const resultNameObj = {
@@ -184,7 +193,7 @@ const handleExcelData = (jsonData) => {
             }
         }
         console.log("结束了")
-        exportToExcel(jsonData)
+        exportToExcel(jsonData, fileList.value[0].name)
     }
     
 }
